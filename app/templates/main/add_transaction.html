@@ -1,0 +1,40 @@
+{% extends "layouts/base.html" %}
+{% from "components/_form_macros.html" import render_field, render_submit %}
+{% block page_title %}Add Transaction{% endblock %}
+{% block page_subtitle %}<p class="text-sm text-slate-500">{{ account.display_name() }}</p>{% endblock %}
+
+{% block content %}
+<div class="mx-auto max-w-lg">
+  <div class="rounded-2xl border border-slate-200/80 bg-white p-6 shadow-sm dark:border-slate-800 dark:bg-slate-900">
+    <form action="" method="post" novalidate>
+      {{ form.hidden_tag() }}
+      {{ render_field(form.transaction_name, placeholder='e.g. Grocery shopping') }}
+      {{ render_field(form.transaction_type) }}
+      {{ render_field(form.category) }}
+      {{ render_field(form.amount, placeholder='0.00') }}
+      {{ render_field(form.recurring) }}
+      <div id="recurring-fields" class="space-y-4 rounded-xl bg-slate-50 p-4 dark:bg-slate-800">
+        {{ render_field(form.how_often) }}
+        {{ render_field(form.enddate) }}
+      </div>
+      {{ render_field(form.note, placeholder='Optional notes') }}
+      {{ render_submit(form.submit) }}
+    </form>
+  </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+  const recurringRadios = document.querySelectorAll('input[name="recurring"]');
+  const recurringFields = document.getElementById('recurring-fields');
+  function toggle() {
+    const isRecurring = document.querySelector('input[name="recurring"]:checked')?.value === 'True';
+    recurringFields.style.display = isRecurring ? 'block' : 'none';
+  }
+  recurringRadios.forEach(r => r.addEventListener('change', toggle));
+  toggle();
+});
+</script>
+{% endblock %}

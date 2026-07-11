@@ -1,0 +1,39 @@
+{% extends "layouts/base.html" %}
+
+{% block guest_content %}
+<div class="flex min-h-screen">
+  {# Left panel — branding #}
+  <div class="hidden lg:flex lg:w-1/2 flex-col justify-between bg-slate-950 p-12 text-white relative overflow-hidden">
+    <div class="absolute inset-0 opacity-30">
+      <div class="absolute top-20 left-20 h-72 w-72 rounded-full bg-emerald-500 blur-[120px]"></div>
+      <div class="absolute bottom-20 right-20 h-72 w-72 rounded-full bg-blue-500 blur-[120px]"></div>
+    </div>
+    <div class="relative z-10">
+      <div class="flex items-center gap-3">
+        <div class="flex h-11 w-11 items-center justify-center rounded-xl bg-emerald-600 font-bold">FM</div>
+        <span class="text-2xl font-bold">Finance<span class="text-emerald-400">Mgr</span></span>
+      </div>
+    </div>
+    <div class="relative z-10 space-y-6">
+      <h2 class="text-4xl font-bold leading-tight">Take control of your<br><span class="text-emerald-400">financial future</span></h2>
+      <p class="text-lg text-slate-400 max-w-md">Track expenses, manage budgets, and grow your savings — all in one beautiful dashboard.</p>
+      <div class="flex gap-8 pt-4">
+        <div><p class="text-3xl font-bold text-emerald-400">50K+</p><p class="text-sm text-slate-500">Transactions tracked</p></div>
+        <div><p class="text-3xl font-bold text-blue-400">99.9%</p><p class="text-sm text-slate-500">Uptime</p></div>
+      </div>
+    </div>
+    <p class="relative z-10 text-sm text-slate-600">&copy; 2026 Finance Manager</p>
+  </div>
+
+  {# Right panel — form #}
+  <div class="flex w-full lg:w-1/2 items-center justify-center bg-slate-50 p-6 dark:bg-slate-900">
+    <div class="w-full max-w-md">
+      <div class="mb-8 lg:hidden text-center">
+        <div class="inline-flex h-11 w-11 items-center justify-center rounded-xl bg-emerald-600 font-bold text-white mb-3">FM</div>
+        <h1 class="text-xl font-bold text-slate-900 dark:text-white">Finance<span class="text-emerald-600">Mgr</span></h1>
+      </div>
+      {% block auth_content %}{% endblock %}
+    </div>
+  </div>
+</div>
+{% endblock %}

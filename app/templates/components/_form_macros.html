@@ -1,0 +1,48 @@
+{# Reusable form field macro for WTForms #}
+{% macro render_field(field, placeholder='', type='text', extra_class='') %}
+<div class="mb-4">
+  {% if field.type != 'BooleanField' %}
+  {{ field.label(class="mb-1.5 block text-sm font-medium text-slate-700 dark:text-slate-300") }}
+  {% endif %}
+  {% if field.type == 'BooleanField' %}
+    <label class="flex items-center gap-2 cursor-pointer">
+      {{ field(class="h-4 w-4 rounded border-slate-300 text-emerald-600 focus:ring-emerald-500") }}
+      <span class="text-sm text-slate-600 dark:text-slate-400">{{ field.label.text }}</span>
+    </label>
+  {% elif field.type == 'RadioField' %}
+    <div class="flex flex-wrap gap-4 mt-1">
+      {% for subfield in field %}
+      <label class="flex items-center gap-2 cursor-pointer">
+        {{ subfield(class="h-4 w-4 border-slate-300 text-emerald-600 focus:ring-emerald-500") }}
+        <span class="text-sm text-slate-600 dark:text-slate-400">{{ subfield.label.text }}</span>
+      </label>
+      {% endfor %}
+    </div>
+  {% elif field.type == 'SelectField' %}
+    {{ field(class="w-full rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-sm text-slate-900 transition focus:border-emerald-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100 " + extra_class) }}
+  {% elif field.type == 'TextAreaField' %}
+    {{ field(class="w-full rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-sm text-slate-900 transition focus:border-emerald-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100 " + extra_class, placeholder=placeholder, rows=3) }}
+  {% elif field.type == 'PasswordField' %}
+    {{ field(class="w-full rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-sm text-slate-900 transition focus:border-emerald-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100 " + extra_class, placeholder=placeholder) }}
+  {% elif field.type == 'DecimalField' or field.type == 'IntegerField' %}
+    {{ field(class="w-full rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-sm text-slate-900 transition focus:border-emerald-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100 " + extra_class, placeholder=placeholder, step="0.01") }}
+  {% elif field.type == 'DateField' %}
+    {{ field(class="w-full rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-sm text-slate-900 transition focus:border-emerald-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100 " + extra_class) }}
+  {% else %}
+    {{ field(class="w-full rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-sm text-slate-900 transition focus:border-emerald-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100 " + extra_class, placeholder=placeholder) }}
+  {% endif %}
+  {% for error in field.errors %}
+  <p class="mt-1 text-xs text-red-500">{{ error }}</p>
+  {% endfor %}
+</div>
+{% endmacro %}
+
+{% macro render_submit(field, variant='primary') %}
+{% if variant == 'primary' %}
+{{ field(class="inline-flex w-full items-center justify-center rounded-xl bg-emerald-600 px-5 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-emerald-700 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2 active:scale-[0.98] cursor-pointer") }}
+{% elif variant == 'danger' %}
+{{ field(class="inline-flex w-full items-center justify-center rounded-xl bg-red-600 px-5 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 cursor-pointer") }}
+{% else %}
+{{ field(class="inline-flex w-full items-center justify-center rounded-xl border border-slate-200 bg-white px-5 py-2.5 text-sm font-semibold text-slate-700 shadow-sm transition hover:bg-slate-50 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-200 cursor-pointer") }}
+{% endif %}
+{% endmacro %}

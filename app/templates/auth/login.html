@@ -1,0 +1,28 @@
+{% extends "layouts/auth.html" %}
+{% from "components/_form_macros.html" import render_field, render_submit %}
+
+{% block auth_content %}
+<div class="rounded-2xl border border-slate-200 bg-white p-8 shadow-sm dark:border-slate-800 dark:bg-slate-900">
+  <h2 class="text-2xl font-bold text-slate-900 dark:text-white">Welcome back</h2>
+  <p class="mt-1 text-sm text-slate-500">Sign in to your account to continue</p>
+
+  <form action="" method="post" novalidate class="mt-6">
+    {{ form.hidden_tag() }}
+    {{ render_field(form.email, placeholder='you@example.com') }}
+    {{ render_field(form.password, placeholder='••••••••') }}
+    <div class="mb-6 flex items-center justify-between">
+      <label class="flex items-center gap-2 cursor-pointer">
+        {{ form.remember_me(class="h-4 w-4 rounded border-slate-300 text-emerald-600 focus:ring-emerald-500") }}
+        <span class="text-sm text-slate-600 dark:text-slate-400">Remember me</span>
+      </label>
+      <a href="{{ url_for('auth.reset_password_request') }}" class="text-sm font-medium text-emerald-600 hover:text-emerald-700">Forgot password?</a>
+    </div>
+    {{ render_submit(form.submit) }}
+  </form>
+
+  <p class="mt-6 text-center text-sm text-slate-500">
+    Don't have an account?
+    <a href="{{ url_for('auth.register') }}" class="font-semibold text-emerald-600 hover:text-emerald-700">Create one</a>
+  </p>
+</div>
+{% endblock %}

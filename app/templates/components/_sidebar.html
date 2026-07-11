@@ -1,0 +1,53 @@
+{# Sidebar navigation #}
+<aside id="sidebar" class="fixed inset-y-0 left-0 z-50 flex w-64 flex-col border-r border-slate-200 bg-white transition-transform duration-300 -translate-x-full lg:translate-x-0 dark:border-slate-800 dark:bg-slate-950">
+  <div class="flex h-16 items-center justify-between border-b border-slate-200 px-5 dark:border-slate-800">
+    <a href="{{ url_for('main.dashboard') }}" class="flex items-center gap-2">
+      <div class="flex h-9 w-9 items-center justify-center rounded-xl bg-emerald-600 text-white font-bold text-sm">FM</div>
+      <span class="text-lg font-bold text-slate-900 dark:text-white">Finance<span class="text-emerald-600">Mgr</span></span>
+    </a>
+    <button id="sidebar-close" class="rounded-lg p-1.5 text-slate-400 hover:bg-slate-100 lg:hidden dark:hover:bg-slate-800">
+      <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+    </button>
+  </div>
+
+  <nav class="flex-1 space-y-1 overflow-y-auto px-3 py-4">
+    {% set nav_items = [
+      ('main.dashboard', 'Dashboard', '📊'),
+      ('main.accounts', 'Accounts', '🏦'),
+      ('main.transactions', 'Transactions', '💳'),
+      ('main.analytics', 'Analytics', '📈'),
+      ('main.budget', 'Budget', '🎯'),
+      ('main.savings', 'Savings Goals', '🐷'),
+      ('main.bills', 'Bills', '🔔'),
+      ('main.reports', 'Reports', '📄'),
+      ('main.insights', 'AI Insights', '✨'),
+      ('settings.index', 'Settings', '⚙️'),
+    ] %}
+    {% for endpoint, label, icon in nav_items %}
+    <a href="{{ url_for(endpoint) }}"
+       class="nav-link flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium text-slate-600 transition hover:bg-slate-100 hover:text-slate-900 dark:text-slate-400 dark:hover:bg-slate-800 dark:hover:text-white
+       {% if request.endpoint == endpoint %}active{% endif %}
+       {% if endpoint == 'main.dashboard' and request.endpoint in ['main.profile', 'main.index'] %}active{% endif %}
+       {% if endpoint == 'main.accounts' and request.endpoint in ['main.account', 'main.add_account', 'main.edit_account', 'main.add_transaction'] %}active{% endif %}">
+      <span>{{ icon }}</span>
+      <span>{{ label }}</span>
+    </a>
+    {% endfor %}
+  </nav>
+
+  <div class="border-t border-slate-200 p-4 dark:border-slate-800">
+    <div class="flex items-center gap-3">
+      <div class="flex h-9 w-9 items-center justify-center rounded-full bg-emerald-100 text-sm font-semibold text-emerald-700 dark:bg-emerald-900/40 dark:text-emerald-400">
+        {{ current_user.first_name[0] }}{{ current_user.last_name[0] }}
+      </div>
+      <div class="flex-1 min-w-0">
+        <p class="truncate text-sm font-medium text-slate-900 dark:text-white">{{ current_user.first_name }} {{ current_user.last_name }}</p>
+        <p class="truncate text-xs text-slate-500">{{ current_user.email }}</p>
+      </div>
+    </div>
+    <a href="{{ url_for('auth.logout') }}" class="mt-3 flex w-full items-center justify-center gap-2 rounded-xl border border-slate-200 px-3 py-2 text-sm font-medium text-slate-600 transition hover:bg-slate-50 dark:border-slate-700 dark:text-slate-400 dark:hover:bg-slate-800">
+      Sign out
+    </a>
+  </div>
+</aside>
+<div id="sidebar-overlay" class="sidebar-overlay hidden fixed inset-0 z-40 bg-black/50 backdrop-blur-sm lg:hidden"></div>

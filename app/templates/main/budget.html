@@ -1,0 +1,52 @@
+{% extends "layouts/base.html" %}
+{% from "components/_form_macros.html" import render_field, render_submit %}
+{% block page_title %}Budget{% endblock %}
+{% block page_subtitle %}<p class="text-sm text-slate-500">{{ now.strftime('%B %Y') }}</p>{% endblock %}
+
+{% block content %}
+<div class="grid grid-cols-1 gap-6 lg:grid-cols-3">
+  <div class="rounded-2xl border border-slate-200/80 bg-white p-6 shadow-sm dark:border-slate-800 dark:bg-slate-900">
+    <h3 class="text-base font-semibold mb-4">Set Budget</h3>
+    <form action="" method="post" novalidate>
+      {{ form.hidden_tag() }}
+      {{ render_field(form.category) }}
+      {{ render_field(form.amount, placeholder='500.00') }}
+      <div class="grid grid-cols-2 gap-3">
+        {{ render_field(form.month) }}
+        {{ render_field(form.year) }}
+      </div>
+      {{ render_submit(form.submit) }}
+    </form>
+  </div>
+
+  <div class="lg:col-span-2 space-y-4">
+    {% for budget in budgets %}
+    <div class="rounded-2xl border border-slate-200/80 bg-white p-5 shadow-sm dark:border-slate-800 dark:bg-slate-900">
+      <div class="flex items-center justify-between mb-3">
+        <div>
+          <h4 class="font-semibold">{{ budget.category.category_name }}</h4>
+          <p class="text-sm text-slate-500">{{ fmt(budget.spent()) }} of {{ fmt(budget.amount) }}</p>
+        </div>
+        <div class="flex items-center gap-3">
+          {% if budget.is_over_budget() %}
+          <span class="rounded-lg bg-red-100 px-2 py-1 text-xs font-semibold text-red-700 dark:bg-red-900/30 dark:text-red-400">Over budget!</span>
+          {% else %}
+          <span class="text-sm font-semibold text-emerald-600">{{ budget.progress_percent() }}%</span>
+          {% endif %}
+          <form action="{{ url_for('main.delete_budget', budget_id=budget.budget_id) }}" method="post">
+            <button type="submit" class="text-xs text-red-500 hover:underline">Remove</button>
+          </form>
+        </div>
+      </div>
+      <div class="progress-bar">
+        <div class="progress-fill {{ 'bg-red-500' if budget.is_over_budget() else '' }}" style="width: {{ budget.progress_percent() }}%"></div>
+      </div>
+    </div>
+    {% else %}
+    <div class="rounded-2xl border border-dashed border-slate-300 p-12 text-center dark:border-slate-700">
+      <p class="text-slate-500">No budgets set for this month.</p>
+    </div>
+    {% endfor %}
+  </div>
+</div>
+{% endblock %}

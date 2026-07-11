@@ -1,0 +1,56 @@
+{% extends "layouts/base.html" %}
+{% block page_title %}Analytics{% endblock %}
+{% block page_subtitle %}<p class="text-sm text-slate-500">{{ ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'][month-1] }} {{ year }}</p>{% endblock %}
+
+{% block content %}
+<div class="grid grid-cols-1 gap-4 sm:grid-cols-3 mb-6">
+  <div class="rounded-2xl border border-slate-200/80 bg-white p-5 shadow-sm dark:border-slate-800 dark:bg-slate-900">
+    <p class="text-sm text-slate-500">Income</p>
+    <p class="text-2xl font-bold text-green-600">{{ fmt(income) }}</p>
+  </div>
+  <div class="rounded-2xl border border-slate-200/80 bg-white p-5 shadow-sm dark:border-slate-800 dark:bg-slate-900">
+    <p class="text-sm text-slate-500">Expenses</p>
+    <p class="text-2xl font-bold text-red-500">{{ fmt(expenses) }}</p>
+  </div>
+  <div class="rounded-2xl border border-slate-200/80 bg-white p-5 shadow-sm dark:border-slate-800 dark:bg-slate-900">
+    <p class="text-sm text-slate-500">Net</p>
+    <p class="text-2xl font-bold {{ 'text-green-600' if net >= 0 else 'text-red-500' }}">{{ fmt(net) }}</p>
+  </div>
+</div>
+
+<div class="grid grid-cols-1 gap-6 lg:grid-cols-2">
+  <div class="rounded-2xl border border-slate-200/80 bg-white p-6 shadow-sm dark:border-slate-800 dark:bg-slate-900">
+    <h3 class="text-base font-semibold mb-4">12-Month Trend</h3>
+    <div class="chart-container"><canvas id="lineChart"></canvas></div>
+  </div>
+  <div class="rounded-2xl border border-slate-200/80 bg-white p-6 shadow-sm dark:border-slate-800 dark:bg-slate-900">
+    <h3 class="text-base font-semibold mb-4">Spending by Category</h3>
+    <div class="chart-container"><canvas id="pieChart"></canvas></div>
+  </div>
+  <div class="rounded-2xl border border-slate-200/80 bg-white p-6 shadow-sm dark:border-slate-800 dark:bg-slate-900 lg:col-span-2">
+    <h3 class="text-base font-semibold mb-4">Monthly Income vs Expenses</h3>
+    <div class="chart-container"><canvas id="barChart"></canvas></div>
+  </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+  const labels = {{ chart_labels | tojson }};
+  const income = {{ income_data | tojson }};
+  const expenses = {{ expense_data | tojson }};
+  FMCharts.line('lineChart', labels, [
+    { label: 'Income', data: income, borderColor: '#22c55e', backgroundColor: 'rgba(34,197,94,0.1)', fill: true },
+    { label: 'Expenses', data: expenses, borderColor: '#ef4444', backgroundColor: 'rgba(239,68,68,0.1)', fill: true },
+  ]);
+  {% if cat_labels %}
+  FMCharts.doughnut('pieChart', {{ cat_labels | tojson }}, {{ cat_data | tojson }});
+  {% endif %}
+  FMCharts.bar('barChart', labels, [
+    { label: 'Income', data: income, backgroundColor: '#22c55e' },
+    { label: 'Expenses', data: expenses, backgroundColor: '#ef4444' },
+  ]);
+});
+</script>
+{% endblock %}

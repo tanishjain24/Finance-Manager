@@ -1,0 +1,125 @@
+{% extends "layouts/base.html" %}
+{% block page_title %}Dashboard{% endblock %}
+{% block page_subtitle %}<p class="text-sm text-slate-500">Overview of your finances</p>{% endblock %}
+
+{% block content %}
+{# Alerts #}
+{% if stats.over_budget_count > 0 or stats.overdue_bills > 0 %}
+<div class="mb-6 space-y-2">
+  {% if stats.over_budget_count > 0 %}
+  <div class="flex items-center gap-3 rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-800 dark:border-red-800 dark:bg-red-950 dark:text-red-200">
+    ⚠️ {{ stats.over_budget_count }} budget{{ 's' if stats.over_budget_count > 1 else '' }} exceeded this month.
+    <a href="{{ url_for('main.budget') }}" class="ml-auto font-semibold underline">View budgets</a>
+  </div>
+  {% endif %}
+  {% if stats.overdue_bills > 0 %}
+  <div class="flex items-center gap-3 rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-800 dark:border-amber-800 dark:bg-amber-950 dark:text-amber-200">
+    🔔 {{ stats.overdue_bills }} overdue bill{{ 's' if stats.overdue_bills > 1 else '' }}.
+    <a href="{{ url_for('main.bills') }}" class="ml-auto font-semibold underline">View bills</a>
+  </div>
+  {% endif %}
+</div>
+{% endif %}
+
+{# Stat cards #}
+<div class="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-5 mb-6">
+  <div class="rounded-2xl border border-slate-200/80 bg-white p-5 shadow-sm dark:border-slate-800 dark:bg-slate-900">
+    <p class="text-sm font-medium text-slate-500">Total Balance</p>
+    <p class="mt-1 text-2xl font-bold text-slate-900 dark:text-white">{{ fmt(stats.total_balance) }}</p>
+  </div>
+  <div class="rounded-2xl border border-slate-200/80 bg-white p-5 shadow-sm dark:border-slate-800 dark:bg-slate-900">
+    <p class="text-sm font-medium text-slate-500">Monthly Income</p>
+    <p class="mt-1 text-2xl font-bold text-green-600">{{ fmt(stats.monthly_income) }}</p>
+  </div>
+  <div class="rounded-2xl border border-slate-200/80 bg-white p-5 shadow-sm dark:border-slate-800 dark:bg-slate-900">
+    <p class="text-sm font-medium text-slate-500">Monthly Expenses</p>
+    <p class="mt-1 text-2xl font-bold text-red-500">{{ fmt(stats.monthly_expenses) }}</p>
+  </div>
+  <div class="rounded-2xl border border-slate-200/80 bg-white p-5 shadow-sm dark:border-slate-800 dark:bg-slate-900">
+    <p class="text-sm font-medium text-slate-500">Savings</p>
+    <p class="mt-1 text-2xl font-bold {{ 'text-green-600' if stats.savings >= 0 else 'text-red-500' }}">{{ fmt(stats.savings) }}</p>
+  </div>
+  <div class="rounded-2xl border border-slate-200/80 bg-white p-5 shadow-sm dark:border-slate-800 dark:bg-slate-900">
+    <p class="text-sm font-medium text-slate-500">Net Worth</p>
+    <p class="mt-1 text-2xl font-bold text-blue-600">{{ fmt(stats.net_worth) }}</p>
+  </div>
+</div>
+
+{# Quick actions #}
+<div class="mb-6 flex flex-wrap gap-3">
+  <a href="{{ url_for('main.add_account') }}" class="inline-flex items-center gap-2 rounded-xl bg-emerald-600 px-4 py-2 text-sm font-semibold text-white hover:bg-emerald-700">+ Add Account</a>
+  <a href="{{ url_for('main.transactions') }}" class="inline-flex items-center gap-2 rounded-xl border border-slate-200 bg-white px-4 py-2 text-sm font-semibold text-slate-700 hover:bg-slate-50 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-200">💳 Transactions</a>
+  <a href="{{ url_for('main.budget') }}" class="inline-flex items-center gap-2 rounded-xl border border-slate-200 bg-white px-4 py-2 text-sm font-semibold text-slate-700 hover:bg-slate-50 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-200">🎯 Set Budget</a>
+  <a href="{{ url_for('main.reports') }}" class="inline-flex items-center gap-2 rounded-xl border border-slate-200 bg-white px-4 py-2 text-sm font-semibold text-slate-700 hover:bg-slate-50 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-200">📄 Export</a>
+</div>
+
+<div class="grid grid-cols-1 gap-6 lg:grid-cols-3">
+  {# Charts #}
+  <div class="lg:col-span-2 space-y-6">
+    <div class="rounded-2xl border border-slate-200/80 bg-white p-6 shadow-sm dark:border-slate-800 dark:bg-slate-900">
+      <h3 class="text-base font-semibold text-slate-900 dark:text-white mb-4">Income vs Expenses</h3>
+      <div class="chart-container"><canvas id="trendChart"></canvas></div>
+    </div>
+    <div class="rounded-2xl border border-slate-200/80 bg-white p-6 shadow-sm dark:border-slate-800 dark:bg-slate-900">
+      <h3 class="text-base font-semibold text-slate-900 dark:text-white mb-4">Recent Transactions</h3>
+      {% include 'main/_transaction_list.html' %}
+    </div>
+  </div>
+
+  <div class="space-y-6">
+    <div class="rounded-2xl border border-slate-200/80 bg-white p-6 shadow-sm dark:border-slate-800 dark:bg-slate-900">
+      <h3 class="text-base font-semibold text-slate-900 dark:text-white mb-4">Spending by Category</h3>
+      <div class="chart-container"><canvas id="categoryChart"></canvas></div>
+    </div>
+
+    {% if accounts %}
+    <div class="rounded-2xl border border-slate-200/80 bg-white p-6 shadow-sm dark:border-slate-800 dark:bg-slate-900">
+      <h3 class="text-base font-semibold text-slate-900 dark:text-white mb-4">Accounts</h3>
+      <div class="space-y-3">
+        {% for acct in accounts %}
+        <a href="{{ url_for('main.account', account_id=acct.account_id) }}" class="flex items-center justify-between rounded-xl bg-slate-50 px-4 py-3 transition hover:bg-slate-100 dark:bg-slate-800 dark:hover:bg-slate-700">
+          <div class="flex items-center gap-3">
+            <span class="text-xl">{{ acct.type_icon() }}</span>
+            <span class="text-sm font-medium">{{ acct.display_name() }}</span>
+          </div>
+          <span class="text-sm font-semibold">{{ fmt(acct.account_networth) }}</span>
+        </a>
+        {% endfor %}
+      </div>
+      <a href="{{ url_for('main.accounts') }}" class="mt-4 block text-center text-sm font-medium text-emerald-600 hover:text-emerald-700">View all accounts →</a>
+    </div>
+    {% endif %}
+
+    {% if upcoming_bills %}
+    <div class="rounded-2xl border border-slate-200/80 bg-white p-6 shadow-sm dark:border-slate-800 dark:bg-slate-900">
+      <h3 class="text-base font-semibold text-slate-900 dark:text-white mb-4">Upcoming Bills</h3>
+      <div class="space-y-3">
+        {% for bill in upcoming_bills %}
+        <div class="flex items-center justify-between text-sm">
+          <span>{{ bill.name }}</span>
+          <span class="font-semibold text-red-500">{{ fmt(bill.amount) }}</span>
+        </div>
+        {% endfor %}
+      </div>
+    </div>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+  FMCharts.line('trendChart',
+    {{ chart_labels | tojson }},
+    [
+      { label: 'Income', data: {{ income_data | tojson }}, borderColor: '#22c55e', backgroundColor: 'rgba(34,197,94,0.1)', fill: true },
+      { label: 'Expenses', data: {{ expense_data | tojson }}, borderColor: '#ef4444', backgroundColor: 'rgba(239,68,68,0.1)', fill: true },
+    ]
+  );
+  {% if cat_labels %}
+  FMCharts.doughnut('categoryChart', {{ cat_labels | tojson }}, {{ cat_data | tojson }});
+  {% endif %}
+});
+</script>
+{% endblock %}

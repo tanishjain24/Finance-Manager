@@ -1,0 +1,53 @@
+{% extends "layouts/base.html" %}
+{% from "components/_form_macros.html" import render_field, render_submit %}
+{% block page_title %}Settings{% endblock %}
+
+{% block content %}
+<div class="grid grid-cols-1 gap-6 lg:grid-cols-2">
+  {# Profile #}
+  <div class="rounded-2xl border border-slate-200/80 bg-white p-6 shadow-sm dark:border-slate-800 dark:bg-slate-900">
+    <h3 class="text-base font-semibold mb-4">Profile</h3>
+    <form action="{{ url_for('settings.update_profile') }}" method="post" novalidate>
+      {{ profile_form.hidden_tag() }}
+      {{ render_field(profile_form.first_name) }}
+      {{ render_field(profile_form.last_name) }}
+      {{ render_field(profile_form.email) }}
+      {{ render_submit(profile_form.submit) }}
+    </form>
+  </div>
+
+  {# Change Password #}
+  <div class="rounded-2xl border border-slate-200/80 bg-white p-6 shadow-sm dark:border-slate-800 dark:bg-slate-900">
+    <h3 class="text-base font-semibold mb-4">Change Password</h3>
+    <form action="{{ url_for('settings.change_password') }}" method="post" novalidate>
+      {{ password_form.hidden_tag() }}
+      {{ render_field(password_form.current_password) }}
+      {{ render_field(password_form.password) }}
+      {{ render_field(password_form.password2) }}
+      {{ render_submit(password_form.submit) }}
+    </form>
+  </div>
+
+  {# Preferences #}
+  <div class="rounded-2xl border border-slate-200/80 bg-white p-6 shadow-sm dark:border-slate-800 dark:bg-slate-900">
+    <h3 class="text-base font-semibold mb-4">Preferences</h3>
+    <form action="{{ url_for('settings.update_preferences') }}" method="post" novalidate>
+      {{ prefs_form.hidden_tag() }}
+      {{ render_field(prefs_form.currency) }}
+      {{ render_field(prefs_form.theme) }}
+      {{ render_field(prefs_form.notifications_enabled) }}
+      {{ render_field(prefs_form.email_notifications) }}
+      {{ render_submit(prefs_form.submit) }}
+    </form>
+  </div>
+
+  {# Danger zone #}
+  <div class="rounded-2xl border border-red-200 bg-red-50 p-6 dark:border-red-800 dark:bg-red-950/30">
+    <h3 class="text-base font-semibold text-red-700 dark:text-red-400 mb-2">Danger Zone</h3>
+    <p class="text-sm text-red-600 dark:text-red-400 mb-4">Permanently delete your account and all associated data.</p>
+    <form action="{{ url_for('main.delete_user') }}" method="post" onsubmit="return confirm('Are you sure? This cannot be undone.')">
+      <button type="submit" class="rounded-xl bg-red-600 px-5 py-2.5 text-sm font-semibold text-white hover:bg-red-700">Delete Account</button>
+    </form>
+  </div>
+</div>
+{% endblock %}
